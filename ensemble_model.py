@@ -2,10 +2,9 @@ import pandas as pd
 import numpy as np
 
 from keras.utils import to_categorical
-from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.model_selection import cross_val_score
-from sklearn.ensemble import BaggingClassifier, AdaBoostClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import BaggingClassifier, AdaBoostClassifier, RandomForestClassifier, GradientBoostingClassifier
 
 def read_adult():
 	"""
@@ -50,16 +49,38 @@ def read_adult():
 if __name__ == '__main__':
 
 	X_train, y_train, X_test, y_test = read_adult()
-	
+	X_train, X_val, y_train, y_val = train_test_split(X_train,
+		y_train,
+		test_size=0.2,
+		random_state=0)
 
 	clf = DecisionTreeClassifier(random_state=0)
 	clf.fit(X_train, y_train)
-	print 'Single:',clf.score(X_test,y_test)
+	print 'Single:',clf.score(X_val,y_val)
 
-	bagg_clf = BaggingClassifier(clf,max_samples=0.7, max_features=1.0, random_state=0)
+	bagg_clf = BaggingClassifier(clf,
+		max_samples=0.7,
+		max_features=1.0,
+		random_state=0)
 	bagg_clf.fit(X_train, y_train)
-	print 'Bagging:',bagg_clf.score(X_test,y_test)
+	print 'Bagging:',bagg_clf.score(X_val,y_val)
 
-	ada_clf = AdaBoostClassifier(clf, n_estimators=50, learning_rate=0.5, random_state=0)
+	ada_clf = AdaBoostClassifier(clf,
+		n_estimators=50,
+		learning_rate=0.5,
+		random_state=0)
 	ada_clf.fit(X_train, y_train)
-	print 'AdaBoost:',ada_clf.score(X_test,y_test)
+	print 'AdaBoost:',ada_clf.score(X_val,y_val)
+
+	gb_clf = GradientBoostingClassifier(n_estimators=100,
+		max_depth=2,
+		learning_rate=0.5,
+		random_state=0)
+	gb_clf.fit(X_train, y_train)
+	print 'Gradient Boosting:',gb_clf.score(X_val,y_val)
+
+	forest_clf = RandomForestClassifier(n_estimators=20,
+		max_depth=5,
+		random_state=0)
+	forest_clf.fit(X_train, y_train)
+	print 'Random Forest:',forest_clf.score(X_val,y_val)
