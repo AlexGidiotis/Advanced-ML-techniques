@@ -82,7 +82,6 @@ if __name__ == '__main__':
 		AdaBoost: n_estimators=50, learning_rates=0.95
 		GradientBoostingClassifier: estimator_nums=, learning_rates=, max_depths=
 		RandomForestClassifier: estimator_nums=, max_depths=
-
 	"""
 
 	dataset = sys.argv[1]
@@ -196,6 +195,30 @@ if __name__ == '__main__':
 	val_preds = best_clf.predict(X_val)
 	print 'Gradient Boosting training f-score:',metrics.f1_score(y_train, preds, average='macro')
 	print 'Gradient Boosting test f-score:',metrics.f1_score(y_val, val_preds, average='macro')
+
+
+	estimator_nums = [50,100,150]
+	max_depths = [2,5,7]
+	best_fscore = 0.0
+	for n in estimator_nums:
+		for d in max_depths:
+			forest_clf = RandomForestClassifier(n_estimators=n,
+				max_depth=d,
+				random_state=0)
+			forest_clf.fit(X_train, y_train)
+			
+			val_preds = forest_clf.predict(X_val)
+			val_score = metrics.f1_score(y_val, val_preds, average='macro')
+			if val_score > best_fscore:
+				best_fscore = val_score
+				best_params = (n,d)
+				best_clf = forest_clf
+
+	print 'best parameters:',best_params
+	preds = best_clf.predict(X_train)
+	val_preds = best_clf.predict(X_val)
+	print 'Random Forest training f-score:',metrics.f1_score(y_train, preds, average='macro')
+	print 'Random Forest test f-score:',metrics.f1_score(y_val, val_preds, average='macro')
 	
 
 	estimator_nums = [50,100]
