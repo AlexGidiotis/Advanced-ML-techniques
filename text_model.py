@@ -18,51 +18,61 @@ if __name__ == '__main__':
 		Bagging: max_samples=0.8, max_features=0.7
 		AdaBoost: n_estimators=300, learning_rates=1.7
 		GradientBoostingClassifier: estimator_nums=, learning_rates=, max_depths=
+		RandomForestClassifier: estimator_nums=, max_depths=
 
 	IMDB:
 		Bagging: max_samples=0.7, max_features=0.95, n_estimators=40
 		AdaBoost: n_estimators=200, learning_rates=1.0
 		GradientBoostingClassifier: estimator_nums=, learning_rates=, max_depths=
+		RandomForestClassifier: estimator_nums=, max_depths=
 
 	SMSSpamCollection:
 		Bagging: max_samples=0.4, max_features=0.6, n_estimators=60
 		AdaBoost: n_estimators=30, learning_rates=1.5
 		GradientBoostingClassifier: estimator_nums=100, learning_rates=0.5, max_depths=3
+		RandomForestClassifier: estimator_nums=, max_depths=
 
 	paper reviews:
 		Bagging: max_samples=0.4, max_features=0.8, n_estimators=20
 		AdaBoost: n_estimators=10, learning_rates=0.3
 		GradientBoostingClassifier: estimator_nums=100, learning_rates=1.0, max_depths=2
+		RandomForestClassifier: estimator_nums=, max_depths=
 
 	yelp:
 		Bagging: max_samples=0.3, max_features=0.95, n_estimators=70
 		AdaBoost: n_estimators=60, learning_rates=1.5
 		GradientBoostingClassifier: estimator_nums=, learning_rates=, max_depths=
+		RandomForestClassifier: estimator_nums=, max_depths=
 
 	amazon:
 		Bagging: max_samples=0.3, max_features=0.5, n_estimators=20
 		AdaBoost: n_estimators=30, learning_rates=0.5
 		GradientBoostingClassifier: estimator_nums=50, learning_rates=0.5, max_depths=7
+		RandomForestClassifier: estimator_nums=, max_depths=
 
 	youtube:
 		Bagging: max_samples=0.3, max_features=0.6, n_estimators=10
 		AdaBoost: n_estimators=10, learning_rates=0.5
 		GradientBoostingClassifier: estimator_nums=50, learning_rates=0.7, max_depths=2
+		RandomForestClassifier: estimator_nums=, max_depths=
 
 	reuters8:
 		Bagging: max_samples=0.5, max_features=0.9, n_estimators=100
 		AdaBoost: n_estimators=100, learning_rates=1.2
 		GradientBoostingClassifier: estimator_nums=, learning_rates=, max_depths=
+		RandomForestClassifier: estimator_nums=, max_depths=
 
 	reuters52:
 		Bagging: max_samples=0.95, max_features=0.95, n_estimators=50
 		AdaBoost: n_estimators=250, learning_rates=1.0
 		GradientBoostingClassifier: estimator_nums=, learning_rates=, max_depths=
+		RandomForestClassifier: estimator_nums=, max_depths=
 
 	reuterswebkb:
 		Bagging: max_samples=0.7, max_features=0.5, n_estimators=100
 		AdaBoost: n_estimators=50, learning_rates=0.95
 		GradientBoostingClassifier: estimator_nums=, learning_rates=, max_depths=
+		RandomForestClassifier: estimator_nums=, max_depths=
 	"""
 
 	dataset = sys.argv[1]
@@ -176,6 +186,30 @@ if __name__ == '__main__':
 	val_preds = best_clf.predict(X_val)
 	print 'Gradient Boosting training f-score:',metrics.f1_score(y_train, preds, average='macro')
 	print 'Gradient Boosting test f-score:',metrics.f1_score(y_val, val_preds, average='macro')
+
+
+	estimator_nums = [50,100,150]
+	max_depths = [2,5,7]
+	best_fscore = 0.0
+	for n in estimator_nums:
+		for d in max_depths:
+			forest_clf = RandomForestClassifier(n_estimators=n,
+				max_depth=d,
+				random_state=0)
+			forest_clf.fit(X_train, y_train)
+			
+			val_preds = forest_clf.predict(X_val)
+			val_score = metrics.f1_score(y_val, val_preds, average='macro')
+			if val_score > best_fscore:
+				best_fscore = val_score
+				best_params = (n,d)
+				best_clf = forest_clf
+
+	print 'best parameters:',best_params
+	preds = best_clf.predict(X_train)
+	val_preds = best_clf.predict(X_val)
+	print 'Random Forest training f-score:',metrics.f1_score(y_train, preds, average='macro')
+	print 'Random Forest test f-score:',metrics.f1_score(y_val, val_preds, average='macro')
 	
 	
 
