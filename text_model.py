@@ -113,13 +113,13 @@ if __name__ == '__main__':
 
 	clf.fit(X_train, y_train)
 	preds = clf.predict(X_train)
-	val_preds = clf.predict(X_val)
+	val_preds = clf.predict(X_test)
 	print 'NB training f-score:',metrics.f1_score(y_train, preds, average='macro')
-	print 'NB test f-score:',metrics.f1_score(y_val, val_preds, average='macro')
+	print 'NB test f-score:',metrics.f1_score(y_test, val_preds, average='macro')
 	
-	estimator_nums = [70]
-	max_samps = [0.3]
-	max_feats = [0.95]
+	estimator_nums = [100]
+	max_samps = [0.7]
+	max_feats = [0.5]
 	best_fscore = 0.0
 	for m in max_samps:
 		for n in estimator_nums:
@@ -145,8 +145,8 @@ if __name__ == '__main__':
 	print 'Bagging test f-score:',metrics.f1_score(y_test, val_preds, average='macro')
 	
 	
-	estimator_nums = [60]
-	learning_rates = [1.5]
+	estimator_nums = [50]
+	learning_rates = [0.95]
 	best_fscore = 0.0
 	for n in estimator_nums:
 		for lr in learning_rates:
@@ -171,7 +171,7 @@ if __name__ == '__main__':
 	
 	
 	estimator_nums = [100]
-	learning_rates = [1.0]
+	learning_rates = [0.5]
 	max_depths = [5]
 	best_fscore = 0.0
 	for n in estimator_nums:

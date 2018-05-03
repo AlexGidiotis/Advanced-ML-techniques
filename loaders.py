@@ -331,7 +331,7 @@ def load_reuters8():
 	class2id = dict((k,idx) for idx,k in enumerate(df[0].unique()))
 
 	X_train = df[1].tolist()
-	X_test = df[1].tolist()
+	X_test = test_df[1].tolist()
 
 	y_train = df[0].map(lambda x: class2id[x]).tolist()
 	y_test = test_df[0].map(lambda x: class2id[x]).tolist()
@@ -377,7 +377,7 @@ def load_reuters52():
 	class2id = dict((k,idx) for idx,k in enumerate(df[0].unique()))
 
 	X_train = df[1].tolist()
-	X_test = df[1].tolist()
+	X_test = test_df[1].tolist()
 
 	y_train = df[0].map(lambda x: class2id[x]).tolist()
 	y_test = test_df[0].map(lambda x: class2id[x]).tolist()
