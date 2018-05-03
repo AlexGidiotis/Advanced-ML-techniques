@@ -107,7 +107,7 @@ def load_sms():
 	"""
 	print 'Loading data...'
 
-	df = pd.read_csv('data/smsspamcollection/SMSSpamCollection',
+	df = pd.read_csv('data/SMSSpamCollection',
 		header=None,
 		delimiter='\t')
 
@@ -198,7 +198,7 @@ def load_paper_reviews():
 def load_yelp():
 	"""
 	"""
-	df = pd.read_json('data/yelp.json',orient='records',lines=True)
+	df = pd.read_json('data/yelp.json',orient='records',lines=True, encoding='utf-8')
 
 	X_data = df['text'].tolist()
 	y_data = df['stars'].tolist()

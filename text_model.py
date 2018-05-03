@@ -15,7 +15,7 @@ from loaders import load_yelp,load_youtube,load_reuters8,load_reuters52,load_web
 if __name__ == '__main__':
 	"""
 	20 newsgroup: 
-		Bagging: max_samples=0.8, max_features=0.7
+		Bagging: max_samples=0.8, max_features=0.7, n_estimators=50
 		AdaBoost: n_estimators=300, learning_rates=1.7
 		GradientBoostingClassifier: estimator_nums=100, learning_rates=0.5, max_depths=5
 		RandomForestClassifier: estimator_nums=100, max_depths=7
@@ -117,9 +117,9 @@ if __name__ == '__main__':
 	print 'NB training f-score:',metrics.f1_score(y_train, preds, average='macro')
 	print 'NB test f-score:',metrics.f1_score(y_val, val_preds, average='macro')
 	
-	estimator_nums = [100]
-	max_samps = [0.7]
-	max_feats = [0.5]
+	estimator_nums = [70]
+	max_samps = [0.3]
+	max_feats = [0.95]
 	best_fscore = 0.0
 	for m in max_samps:
 		for n in estimator_nums:
@@ -140,13 +140,13 @@ if __name__ == '__main__':
 
 	print 'best parameters:',best_params
 	preds = best_clf.predict(X_train)
-	val_preds = best_clf.predict(X_val)
+	val_preds = best_clf.predict(X_test)
 	print 'Bagging training f-score:',metrics.f1_score(y_train, preds, average='macro')
-	print 'Bagging test f-score:',metrics.f1_score(y_val, val_preds, average='macro')
+	print 'Bagging test f-score:',metrics.f1_score(y_test, val_preds, average='macro')
 	
 	
-	estimator_nums = [50]
-	learning_rates = [0.95]
+	estimator_nums = [60]
+	learning_rates = [1.5]
 	best_fscore = 0.0
 	for n in estimator_nums:
 		for lr in learning_rates:
@@ -165,14 +165,14 @@ if __name__ == '__main__':
 
 	print 'best parameters:',best_params
 	preds = best_clf.predict(X_train)
-	val_preds = best_clf.predict(X_val)
+	val_preds = best_clf.predict(X_test)
 	print 'AdaBoost training f-score:',metrics.f1_score(y_train, preds, average='macro')
-	print 'AdaBoost test f-score:',metrics.f1_score(y_val, val_preds, average='macro')
+	print 'AdaBoost test f-score:',metrics.f1_score(y_test, val_preds, average='macro')
 	
 	
 	estimator_nums = [100]
-	learning_rates = [0.5,1.0,1.5]
-	max_depths = [2,5]
+	learning_rates = [1.0]
+	max_depths = [5]
 	best_fscore = 0.0
 	for n in estimator_nums:
 		for lr in learning_rates:
@@ -192,13 +192,13 @@ if __name__ == '__main__':
 
 	print 'best parameters:',best_params
 	preds = best_clf.predict(X_train)
-	val_preds = best_clf.predict(X_val)
+	val_preds = best_clf.predict(X_test)
 	print 'Gradient Boosting training f-score:',metrics.f1_score(y_train, preds, average='macro')
-	print 'Gradient Boosting test f-score:',metrics.f1_score(y_val, val_preds, average='macro')
+	print 'Gradient Boosting test f-score:',metrics.f1_score(y_test, val_preds, average='macro')
 
 
-	estimator_nums = [50,100,150]
-	max_depths = [2,5,7]
+	estimator_nums = [50]
+	max_depths = [7]
 	best_fscore = 0.0
 	for n in estimator_nums:
 		for d in max_depths:
@@ -216,33 +216,9 @@ if __name__ == '__main__':
 
 	print 'best parameters:',best_params
 	preds = best_clf.predict(X_train)
-	val_preds = best_clf.predict(X_val)
+	val_preds = best_clf.predict(X_test)
 	print 'Random Forest training f-score:',metrics.f1_score(y_train, preds, average='macro')
-	print 'Random Forest test f-score:',metrics.f1_score(y_val, val_preds, average='macro')
-	
-
-	estimator_nums = [50,100]
-	max_depths = [5,10,50,100]
-	best_fscore = 0.0
-	for n in estimator_nums:
-		for d in max_depths:
-			forest_clf = RandomForestClassifier(n_estimators=n,
-				max_depth=d,
-				random_state=0)
-			forest_clf.fit(X_train, y_train)
-			
-			val_preds = forest_clf.predict(X_val)
-			val_score = metrics.f1_score(y_val, val_preds, average='macro')
-			if val_score > best_fscore:
-				best_fscore = val_score
-				best_params = (n,d)
-				best_clf = forest_clf
-
-	print 'best parameters:',best_params
-	preds = best_clf.predict(X_train)
-	val_preds = best_clf.predict(X_val)
-	print 'Random Forest training f-score:',metrics.f1_score(y_train, preds, average='macro')
-	print 'Random Forest test f-score:',metrics.f1_score(y_val, val_preds, average='macro')
+	print 'Random Forest test f-score:',metrics.f1_score(y_test, val_preds, average='macro')
 	
 	
 
