@@ -102,6 +102,7 @@ def load_model():
 
 
 
+
 if __name__ == '__main__':
 
 	ngram_range = 1
@@ -118,7 +119,7 @@ if __name__ == '__main__':
 	num_features = len(word_index)
 	print('Found %d words' % num_features)
 
-
+	
 	model = build_model(num_features,num_classes,embedding_dims,maxlen)
 
 	model_json = model.to_json()
@@ -142,16 +143,16 @@ if __name__ == '__main__':
 		epochs=epochs,
 		validation_data=(X_val, y_val),
 		callbacks=[model_checkpoint,early_stopping])
-
+	
 
 	model = load_model()
 	y_pred = model.predict(X_test)
 
 	print 'AUC:',roc_auc_score(y_test, y_pred)
-
-	y_pred[y_pred > 0.5] = 1
-	y_pred[y_pred <= 0.5] = 0
+	y_pred[y_pred > 0.25] = 1
+	y_pred[y_pred <= 0.25] = 0
 	
+
 	for i in range(10):
 		pred,lab = y_pred[i],y_test[i]
 		print np.where(pred == 1), np.where(lab == 1)
