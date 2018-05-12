@@ -8,6 +8,7 @@ from sklearn.metrics import precision_recall_fscore_support, roc_auc_score
 from keras.models import Model, model_from_json
 from keras.layers import Dense, Input, Embedding, GlobalAveragePooling1D
 from keras.callbacks import EarlyStopping, ModelCheckpoint, Callback
+from keras import regularizers
 
 import tensorflow as tf
 
@@ -56,7 +57,8 @@ def build_model(num_features,
 
 	embeddings = Embedding(num_features,
 		embedding_dims,
-		input_length=maxlen)(input_layer)
+		input_length=maxlen,
+		embeddings_regularizer=regularizers.l1(7e-7))(input_layer)
 
 	avg_layer = GlobalAveragePooling1D()(embeddings)
 	predictions = Dense(num_classes, activation='sigmoid')(avg_layer)
