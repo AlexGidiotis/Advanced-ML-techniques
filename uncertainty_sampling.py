@@ -23,6 +23,7 @@ if __name__ == '__main__':
     y_test_test = y_test[1992:, -1]
 
     acc = []
+    train_acc = []
     dim = []
 
     for k in range(0,10,1):
@@ -56,10 +57,11 @@ if __name__ == '__main__':
             del values[pos]
             del positions[pos]
 
-        acc.append(clf.score(X_test_test, y_test_test))
+        acc.append((1-clf.score(X_test_test, y_test_test)))
+        train_acc.append((1-clf.score(X_train, y_train)))
         dim.append(X_train.shape[0])
 
-    plt.plot(dim, acc)
+    plt.plot(dim, acc, dim, train_acc)
     plt.show()
 
 
