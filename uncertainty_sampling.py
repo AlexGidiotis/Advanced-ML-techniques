@@ -3,12 +3,13 @@ import numpy as np
 from delicious_loader import load_dataset
 from sklearn import svm
 from sklearn.linear_model import LogisticRegression
+import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     ngram_range = 1
     maxlen = 200
 
-    X_train, y_train, X_val, y_val, X_test, y_test, word_index = load_dataset(ngram_range, maxlen)
+    X_train, y_train, X_val, y_val, X_test, y_test, word_index = load_dataset(ngram_range=ngram_range, maxlen=maxlen)
 
     # Column 19 is the rarest
 
@@ -20,6 +21,9 @@ if __name__ == '__main__':
     X_test_test = X_test[1992:, :]
     y_test_unlabeled_pool = y_test[:1992, -1]
     y_test_test = y_test[1992:, -1]
+
+    acc = []
+    dim = []
 
     for k in range(0,10,1):
         clf = LogisticRegression()
@@ -52,7 +56,11 @@ if __name__ == '__main__':
             del values[pos]
             del positions[pos]
 
-        print clf.score(X_test_test, y_test_test)
+        acc.append(clf.score(X_test_test, y_test_test))
+        dim.append(X_train.shape[0])
+
+    plt.plot(dim, acc)
+    plt.show()
 
 
 
