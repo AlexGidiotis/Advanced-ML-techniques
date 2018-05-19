@@ -74,8 +74,8 @@ def add_ngram(sequences, token_indice, ngram_range=2):
 
 
 
-def load_dataset(ngram_range,
-	maxlen):
+def load_dataset(maxlen,
+	ngram_range=1):
 	"""
 	"""
 	train_data = 'data/delicious/train-data.dat'
