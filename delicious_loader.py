@@ -17,6 +17,7 @@ def read_data(file,
 
 	X_data = pd.read_csv(file,header=None)
 	y_data = pd.read_csv(lab_file,header=None)
+
 	X_data = X_data[0].map(lambda x: re.sub('<\d+>','',x) \
 		.strip() \
 		.split())
@@ -24,6 +25,50 @@ def read_data(file,
 	y_data = y_data[0].map(lambda x: np.array([int(lab) for lab in x.split()]))
 
 	return X_data.tolist(),np.array(y_data.tolist())
+
+
+
+
+
+
+
+def read_data_sentences(file,
+	lab_file,
+	maxlen,
+	max_sentence_len):
+	"""
+	"""
+
+	X_data = pd.read_csv(file,header=None)
+	y_data = pd.read_csv(lab_file,header=None)
+
+	X_data = X_data[0].map(lambda x: x.strip())
+
+	X_data = X_data.map(lambda x: re.findall('<\d+>([^<]+)',x)[1:])
+
+	X_data = X_data.map(lambda x: [[int(tok.strip()) for tok in sent.strip().split()] for sent in x ])
+
+	y_data = y_data[0].map(lambda x: np.array([int(lab) for lab in x.split()]))
+
+	X_data = X_data.tolist()
+	X_data_int = np.zeros((len(X_data),maxlen,max_sentence_len))
+	for idx,text_bag in enumerate(X_data):
+		sentences_batch = np.zeros((maxlen,max_sentence_len))
+		sentences =  sequence.pad_sequences(text_bag,
+			maxlen=max_sentence_len,
+			padding='post',
+			truncating='post',
+			dtype='int32')
+		for j,sent in enumerate(sentences):
+			if j >= max_sentence_len:
+				break
+			sentences_batch[j,:] = sent
+		X_data_int[idx,:,:] = sentences_batch
+
+	X_data = X_data_int
+
+	return X_data,np.array(y_data.tolist())
+
 
 
 
@@ -139,6 +184,47 @@ def load_dataset(maxlen,
 	X_train = sequence.pad_sequences(X_train, maxlen=maxlen)
 	X_val = sequence.pad_sequences(X_val, maxlen=maxlen)
 	X_test = sequence.pad_sequences(X_test, maxlen=maxlen)
+	print('X_train shape:', X_train.shape)
+	print('X_val shape:', X_val.shape)
+	print('X_test shape:', X_test.shape)
+
+
+	return X_train,y_train,X_val,y_val,X_test,y_test,word_index
+
+
+
+
+
+
+def load_dataset_hierarchical(maxlen,
+	max_sentence_len):
+	"""
+	"""
+	train_data = 'data/delicious/train-data.dat'
+	train_labels = 'data/delicious/train-label.dat'
+	val_data = 'data/delicious/valid-data.dat'
+	val_labels = 'data/delicious/valid-label.dat'
+	test_data = 'data/delicious/test-data.dat'
+	test_labels = 'data/delicious/test-label.dat'
+	vocab_file = 'data/delicious/vocabs.txt'
+
+
+	print('Loading data...')
+	X_train, y_train = read_data_sentences(train_data,train_labels,maxlen,max_sentence_len)
+	X_val, y_val = read_data_sentences(val_data,val_labels,maxlen,max_sentence_len)
+	X_test, y_test = read_data_sentences(test_data,test_labels,maxlen,max_sentence_len)
+	
+
+	word_index = {}
+	with open(vocab_file,'r') as vf:
+		for line in vf:
+			line = line.strip().split(', ')
+			key = line[0]
+			value = int(line[1])
+			word_index[key] = value
+
+	max_features = len(word_index)
+
 	print('X_train shape:', X_train.shape)
 	print('X_val shape:', X_val.shape)
 	print('X_test shape:', X_test.shape)
