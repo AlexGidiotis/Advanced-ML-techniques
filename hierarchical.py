@@ -61,29 +61,16 @@ def build_model(num_features,
 	embeddings = Embedding(num_features,
 		embedding_dims,
 		input_length=max_sentence_len,
-		embeddings_regularizer=regularizers.l1(0))(sentence_input)
+		embeddings_regularizer=regularizers.l1(1e-6))(sentence_input)
 
 	avg_layer = GlobalAveragePooling1D()(embeddings)
 	sentEncoder = Model(inputs=sentence_input, outputs=avg_layer)
 	sentEncoder.summary()
 	textEncoder = TimeDistributed(sentEncoder)(input_layer)
 
-	drop1 = Dropout(0.0)(textEncoder)
+	global_avg_layer = GlobalAveragePooling1D()(textEncoder)
 
-	lstm = Bidirectional(LSTM(20, name='blstm_1',
-		activation='tanh',
-		recurrent_activation='hard_sigmoid',
-		recurrent_dropout=0.0,
-		dropout=0.0, 
-		kernel_initializer='glorot_uniform',
-		return_sequences=True),
-		merge_mode='concat')(drop1)
-
-
-	att_layer = GlobalAveragePooling1D()(lstm)
-	drop2 = Dropout(0.0)(att_layer)
-
-	predictions = Dense(num_classes, activation='sigmoid')(drop2)
+	predictions = Dense(num_classes, activation='sigmoid')(global_avg_layer)
 
 	model = Model(inputs=input_layer, outputs=predictions)
 	model.compile(loss='binary_crossentropy',
