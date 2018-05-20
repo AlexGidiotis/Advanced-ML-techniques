@@ -6,7 +6,7 @@ from sklearn.metrics import precision_recall_fscore_support, roc_auc_score
 
 
 from keras.models import Model, model_from_json
-from keras.layers import Dense, Input, Embedding, GlobalAveragePooling1D, TimeDistributed, LSTM, Dropout
+from keras.layers import Dense, Input, Embedding, GlobalAveragePooling1D, TimeDistributed, LSTM, Dropout, Flatten
 from keras.callbacks import EarlyStopping, ModelCheckpoint, Callback
 from keras.layers.wrappers import Bidirectional
 from keras import regularizers
@@ -64,15 +64,20 @@ def build_model(num_features,
 		embeddings_regularizer=regularizers.l1(1e-6))(sentence_input)
 
 	avg_layer = GlobalAveragePooling1D()(embeddings)
-	sentEncoder = Model(inputs=sentence_input, outputs=avg_layer)
+	sentEncoder = Model(inputs=sentence_input,
+		outputs=avg_layer)
 	sentEncoder.summary()
 	textEncoder = TimeDistributed(sentEncoder)(input_layer)
 
-	global_avg_layer = GlobalAveragePooling1D()(textEncoder)
+	global_avg_layer = Flatten()(textEncoder)
 
-	predictions = Dense(num_classes, activation='sigmoid')(global_avg_layer)
+	global_avg_layer = Dropout(0.5)(global_avg_layer)
+	predictions = Dense(num_classes, 
+		activation='sigmoid',
+		kernel_regularizer=regularizers.l1(1e-5))(global_avg_layer)
 
-	model = Model(inputs=input_layer, outputs=predictions)
+	model = Model(inputs=input_layer,
+		outputs=predictions)
 	model.compile(loss='binary_crossentropy',
               optimizer='adam',
               metrics=[f1_score])
@@ -132,7 +137,7 @@ if __name__ == '__main__':
 	num_features = len(word_index)
 	print('Found %d words' % num_features)
 
-	
+	'''
 	model = build_model(num_features,num_classes,embedding_dims,maxlen,max_sentence_len)
 	
 	model_json = model.to_json()
@@ -157,7 +162,7 @@ if __name__ == '__main__':
 		validation_data=(X_val, y_val),
 		callbacks=[model_checkpoint,early_stopping])
 	
-
+	'''
 	model = load_model()
 	y_pred = model.predict(X_test)
 
