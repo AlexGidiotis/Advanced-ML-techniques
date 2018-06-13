@@ -58,7 +58,7 @@ def build_model(num_features,
 	embeddings = Embedding(num_features,
 		embedding_dims,
 		input_length=maxlen,
-		embeddings_regularizer=regularizers.l1(10e-7))(input_layer)
+		embeddings_regularizer=regularizers.l1(7e-7))(input_layer)
 
 	avg_layer = GlobalAveragePooling1D()(embeddings)
 	predictions = Dense(num_classes, activation='sigmoid')(avg_layer)
@@ -146,13 +146,13 @@ if __name__ == '__main__':
 		validation_data=(X_val, y_val),
 		callbacks=[model_checkpoint,early_stopping])
 	
-	
+
 	model = load_model()
 	y_pred = model.predict(X_test)
 
 	print 'AUC:',roc_auc_score(y_test, y_pred)
-	y_pred[y_pred > 0.24] = 1
-	y_pred[y_pred <= 0.24] = 0
+	y_pred[y_pred > 0.25] = 1
+	y_pred[y_pred <= 0.25] = 0
 	
 
 	for i in range(10):
